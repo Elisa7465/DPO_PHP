@@ -1,0 +1,37 @@
+services:
+  web:
+    # Создаём сервис "web" — это наш веб-сервер с PHP и Apache
+    build:
+      context: ./app          # Папка с Dockerfile и кодом приложения
+      dockerfile: Dockerfile  # Имя Dockerfile для сборки образа
+    ports:
+      - "8080:80"             # Пробрасываем порт 80 из контейнера на порт 8080 хоста (чтобы зайти в браузере на localhost:8080)
+    volumes:
+      - ./app:/var/www/html   # Монтируем локальную папку ./app в папку с сайтом внутри контейнера (чтобы изменения кода сразу были видны)
+    depends_on:
+      - db                    # Запускаем контейнер "db" (базу данных) перед запуском web
+
+  db:
+    # Сервис базы данных PostgreSQL
+    image: postgres:15         # Используем официальный образ PostgreSQL версии 15
+    restart: always            # Автоматически перезапускаем контейнер при сбоях
+    environment:
+      - POSTGRES_DB=mydb       # Имя создаваемой базы данных
+      - POSTGRES_USER=user     # Имя пользователя для доступа к БД
+      - POSTGRES_PASSWORD=userpass # Пароль пользователя
+    volumes:
+      - db_data:/var/lib/postgresql/data # Монтируем постоянный том для хранения данных базы (чтобы данные сохранялись между перезапусками)
+
+  adminer:
+    # Веб-интерфейс для удобного управления базой данных (Adminer)
+    image: adminer             # Официальный образ Adminer
+    restart: always            # Автоматический рестарт при сбоях
+    ports:
+      - "80:8080"              # Пробрасываем порт: localhost:80 будет открывать интерфейс Adminer на порту 8080 внутри контейнера
+    environment:
+      - ADMINER_DEFAULT_SERVER=db  # По умолчанию подключаемся к сервису "db" (PostgreSQL)
+    depends_on:
+      - db                    # Запускаем adminer после запуска базы данных
+
+volumes:
+  db_data:                    # Объявление тома для хранения данных PostgreSQL (чтобы данные не терялись при пересоздании контейнера)
