@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  php:
+    # Собираем PHP-контейнер из папки docker/php (там должен быть Dockerfile)
+    build:
+      context: ./docker/php
+    # Монтируем локальную папку src в контейнер для работы с кодом
+    volumes:
+      - ./src:/var/www/html
+    # PHP зависит от контейнера базы данных Postgres — запускается после него
+    depends_on:
+      - postgres
+
+  nginx:
+    # Используем официальный образ Nginx для веб-сервера
+    image: nginx:latest
+    ports:
+      - "8080:80"  # Пробрасываем порт 80 из контейнера на 8080 хоста
+    volumes:
+      - ./src:/var/www/html                      # Монтируем код приложения в папку сайта
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf  # Конфигурация nginx из локального файла
+    depends_on:
+      - php   # Запускается после PHP-контейнера
+
+  postgres:
+    # Образ PostgreSQL версии 15 для базы данных
+    image: postgres:15
+    environment:
+      POSTGRES_USER: root            # Имя пользователя для доступа к БД
+      POSTGRES_PASSWORD: root        # Пароль пользователя
+      POSTGRES_DB: mvc_library       # Имя базы данных, которая будет создана
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Том для сохранения данных между перезапусками
+    ports:
+      - "5432:5432"  # Пробрасываем порт базы для доступа из хоста (например, для администрирования)
+
+  adminer:
+    # Админ-панель для управления базой данных (Adminer)
+    image: adminer:latest
+    ports:
+      - "8081:8080"  # Порт для доступа к админке (в браузере localhost:8081)
+    depends_on:
+      - postgres  # Запускается после базы данных
+
+volumes:
+  postgres_data:   # Объявляем именованный том для базы данных

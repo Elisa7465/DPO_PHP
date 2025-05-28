@@ -1,0 +1,54 @@
+{% extends "layouts/base.twig" %}
+{# Расширяем базовый шаблон сайта #}
+
+{% block content %}
+    <h2 class="mb-4">Добавить книгу</h2>
+
+    {# Если есть ошибка, показываем её в красном блоке alert #}
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {# Форма для добавления книги с поддержкой загрузки файлов (enctype) #}
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">Название</label>
+            {# Поле для ввода названия книги, заполняется старым значением, если есть #}
+            <input type="text" class="form-control" id="title" name="title" value="{{ old.title }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="author" class="form-label">Автор</label>
+            {# Поле для автора книги #}
+            <input type="text" class="form-control" id="author" name="author" value="{{ old.author }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="cover" class="form-label">Обложка (PNG, JPG)</label>
+            {# Поле для загрузки файла обложки, с ограничением по типу файлов и обязательным заполнением #}
+            <input type="file" class="form-control" id="cover" name="cover" accept=".jpg,.jpeg,.png" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="book_file" class="form-label">Файл книги (до 5MB)</label>
+            {# Поле для загрузки файла книги, не обязательно #}
+            <input type="file" class="form-control" id="book_file" name="book_file">
+        </div>
+
+        <div class="mb-3">
+            <label for="read_date" class="form-label">Дата прочтения</label>
+            {# Поле для ввода даты прочтения, с сохранением ранее введённого значения #}
+            <input type="date" class="form-control" id="read_date" name="read_date" value="{{ old.read_date }}" required>
+        </div>
+
+        <div class="mb-3 form-check">
+            {# Чекбокс для разрешения скачивания книги, ставится галочка если old.is_downloadable истинен #}
+            <input type="checkbox" class="form-check-input" id="is_downloadable" name="is_downloadable" {% if old.is_downloadable %}checked{% endif %}>
+            <label class="form-check-label" for="is_downloadable">Разрешить скачивание</label>
+        </div>
+
+        {# Кнопки отправки формы и отмены (ссылка на главную) #}
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="/" class="btn btn-secondary">Отмена</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "layouts/base.twig" %}
+{# Расширяем базовый шаблон сайта #}
+
+{% block content %}
+    <h2 class="mb-4">Редактировать книгу</h2>
+
+    {# Если есть ошибка, выводим её в красном alert #}
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {# Форма редактирования книги с поддержкой загрузки файлов #}
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">Название</label>
+            {# Поле для названия книги:
+               если есть старые данные из формы (old.title), используем их,
+               иначе отображаем текущее значение книги через метод getTitle() #}
+            <input type="text" class="form-control" id="title" name="title" value="{{ old.title ?? book.getTitle() }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="author" class="form-label">Автор</label>
+            {# Аналогично для автора книги #}
+            <input type="text" class="form-control" id="author" name="author" value="{{ old.author ?? book.getAuthor() }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="cover" class="form-label">Обложка (PNG, JPG)</label>
+            {# Если у книги есть обложка, показываем её с возможностью удалить #}
+            {% if book.getCoverPath() %}
+                <div class="mb-2">
+                    <img src="{{ book.getCoverPath() }}" alt="Текущая обложка" style="max-width: 200px;">
+                    <div class="form-check mt-2">
+                        <input type="checkbox" class="form-check-input" id="remove_cover" name="remove_cover">
+                        <label class="form-check-label" for="remove_cover">Удалить обложку</label>
+                    </div>
+                </div>
+            {% endif %}
+            {# Поле для загрузки новой обложки (необязательно) #}
+            <input type="file" class="form-control" id="cover" name="cover" accept=".jpg,.jpeg,.png">
+        </div>
+
+        <div class="mb-3">
+            <label for="book_file" class="form-label">Файл книги (до 5MB)</label>
+            {# Если у книги есть файл, показываем ссылку на скачивание и чекбокс для удаления #}
+            {% if book.getDownloadLink() %}
+                <div class="mb-2">
+                    <p>Текущий файл: <a href="{{ book.getDownloadLink() }}" target="_blank">Скачать</a></p>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="remove_book" name="remove_book">
+                        <label class="form-check-label" for="remove_book">Удалить файл</label>
+                    </div>
+                </div>
+            {% endif %}
+            {# Поле для загрузки нового файла книги (необязательно) #}
+            <input type="file" class="form-control" id="book_file" name="book_file">
+        </div>
+
+        <div class="mb-3">
+            <label for="read_date" class="form-label">Дата прочтения</label>
+            {# Поле для даты прочтения:
+               используем старые данные из формы или дату из объекта книги в формате YYYY-MM-DD #}
+            <input type="date" class="form-control" id="read_date" name="read_date" 
+                   value="{{ old.read_date ?? book.getReadDate()|date('Y-m-d') }}" required>
+        </div>
+
+        <div class="mb-3 form-check">
+            {# Чекбокс для разрешения скачивания:
+               ставим галочку, если старое значение true или книга разрешает скачивание #}
+            <input type="checkbox" class="form-check-input" id="is_downloadable" name="is_downloadable" 
+                   {% if old.is_downloadable ?? book.isDownloadable() %}checked{% endif %}>
+            <label class="form-check-label" for="is_downloadable">Разрешить скачивание</label>
+        </div>
+
+        {# Кнопки сохранения и отмены #}
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="/" class="btn btn-secondary">Отмена</a>
+    </form>
+{% endblock %}

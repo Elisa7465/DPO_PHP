@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Лабиринт книг{% endblock %}</title>
+    <!-- Подключение Bootstrap CSS для стилизации -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Иконки Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Основные CSS переменные с цветами для сайта */
+        :root {
+            --primary-color: #7FB77E;       /* Основной зелёный цвет */
+            --primary-hover: #6ea76d;       /* Цвет при наведении */
+            --background-color: #F7FFE5;    /* Цвет фона страницы */
+            --header-color: #C7E9B0;        /* Цвет шапки сайта */
+            --card-color: #ffffff;          /* Цвет карточек */
+            --text-color: #0A2A24;          /* Цвет текста */
+        }
+
+        /* Фон и цвет текста всей страницы */
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* Стили шапки сайта */
+        .header {
+            background-color: var(--header-color);
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Логотип */
+        .logo {
+            height: 40px;
+            width: 40px;
+            margin-right: 1rem;
+        }
+
+        /* Обложки книг — максимальная ширина 200px, сохранение пропорций */
+        .book-cover {
+            max-width: 200px;
+            height: auto;
+            object-fit: cover;
+        }
+
+        /* Отступы для карточек книг и высота */
+        .book-card {
+            margin-bottom: 2rem;
+            height: 100%;
+        }
+
+        /* Карточки книги — высота на весь блок, flex-контейнер для выравнивания */
+        .card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--card-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Тело карточки — flex-колонка с растягиванием */
+        .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Блок с кнопками — прижимается к низу карточки */
+        .card-actions {
+            margin-top: auto;
+        }
+
+        /* Основные стили кнопок */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Ховер эффект для кнопок */
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        /* Кнопки с outline */
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Ховер эффект для outline кнопок */
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Стили для успешных сообщений (alert-success) */
+        .alert-success {
+            background-color: #B5D5B0;
+            border-color: #9DC49A;
+            color: #2C5530;
+        }
+
+        /* Фокус для полей ввода формы */
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(127, 183, 126, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхняя шапка сайта -->
+    <header class="header mb-4">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="/" class="text-decoration-none text-dark">
+                    <div class="d-flex align-items-center">
+                        <!-- Логотип -->
+                        <img src="/images/logo.svg" alt="Logo" class="logo">
+                        <h1 class="h4 mb-0">Лабиринт книг</h1>
+                    </div>
+                </a>
+                <div>
+                    {% if is_authenticated %}
+                        {# Показываем email пользователя и кнопку выхода #}
+                        <span class="me-3">{{ user.getEmail() }}</span>
+                        <a href="/logout" class="btn btn-outline-primary">
+                            <i class="bi bi-box-arrow-right"></i> Выход из аккаунта
+                        </a>
+                    {% else %}
+                        {# Если не авторизован, показываем кнопки входа и регистрации #}
+                        <a href="/login" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-box-arrow-in-right"></i> Вход
+                        </a>
+                        <a href="/register" class="btn btn-primary">
+                            <i class="bi bi-person-plus"></i> Регистрация
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основное содержимое страницы -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Подключение Bootstrap JS (с Popper.js) для работы интерактивных компонентов -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
