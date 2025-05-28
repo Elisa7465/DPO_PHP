@@ -1,0 +1,38 @@
+services:
+  # === Веб-сервер (PHP + Apache) ===
+  web:
+    build:
+      context: ./app         # Путь к директории с исходным кодом (где находится Dockerfile)
+      dockerfile: Dockerfile # Явно указываем Dockerfile
+    ports:
+      - "8080:80"            # Пробрасываем порт 80 контейнера на 8080 хоста (открываем сайт по http://localhost:8080)
+    volumes:
+      - ./app:/var/www/html  # Монтируем директорию проекта внутрь контейнера (горячая перезагрузка кода)
+    depends_on:
+      - db                   # Запускается только после старта сервиса db
+
+  # === СУБД PostgreSQL ===
+  db:
+    image: postgres:15       # Используем официальный образ PostgreSQL версии 15
+    restart: always          # Автоматически перезапускается при сбое или перезапуске Docker
+    environment:
+      - POSTGRES_DB=mydb             # Название создаваемой БД
+      - POSTGRES_USER=user           # Имя пользователя
+      - POSTGRES_PASSWORD=userpass   # Пароль
+    volumes:
+      - db_data:/var/lib/postgresql/data # Храним данные БД в отдельном volume (персистентность)
+
+  # === Adminer — графический интерфейс для работы с БД ===
+  adminer:
+    image: adminer            # Официальный образ Adminer
+    restart: always
+    ports:
+      - "80:8080"             # Пробрасываем порт 8080 контейнера на 80 хоста (доступ по http://localhost)
+    environment:
+      - ADMINER_DEFAULT_SERVER=db  # Устанавливаем PostgreSQL как сервер по умолчанию
+    depends_on:
+      - db                    # Запускается после старта базы данных
+
+# === Именованный том для хранения данных PostgreSQL вне контейнера ===
+volumes:
+  db_data:
